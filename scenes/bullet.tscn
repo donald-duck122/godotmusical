@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3 uid="uid://behw75osm6ats"]
+
+[ext_resource type="Script" path="res://scripts/bullet.gd" id="1_601kd"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_22eo0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rqari"]
+size = Vector2(47, 38)
+
+[node name="bullet" type="RigidBody2D"]
+collision_layer = 4
+collision_mask = 11
+gravity_scale = 0.0
+max_contacts_reported = 10
+contact_monitor = true
+lock_rotation = true
+script = ExtResource("1_601kd")
+
+[node name="LifeTime" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(22.75, 18.25)
+scale = Vector2(46.5, 37.5)
+texture = SubResource("PlaceholderTexture2D_22eo0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(22.5, 18)
+shape = SubResource("RectangleShape2D_rqari")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="LifeTime" to="." method="_on_life_time_timeout"]
