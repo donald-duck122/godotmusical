@@ -1,9 +1,10 @@
 extends CharacterBody2D
-signal playerHit
+signal playerHit(currentHealth)
 
 @export var playerSpeed = 400
-@export var heath = 10
+@export var health = 10
 @export var jumpForce = 10
+@export var invincibleTime = 0.5
 
 @export var bullet : PackedScene
 @export var bulletSpeed = 40
@@ -12,6 +13,7 @@ signal playerHit
 @export var dashCooldown = 2
 
 var screenSize
+var invincible = false
 var jumping = false
 var canShoot = false
 var canDash = false
@@ -48,9 +50,6 @@ func _process(_delta):
 		#assigning a boolean expression, instead of using if
 		$AnimatedSprite2D.flip_v = false
 		$AnimatedSprite2D.flip_h = direction.x < 0
-#	elif direction.y != 0:
-#		$AnimatedSprite2D.animation = "up"
-#		$AnimatedSprite2D.flip_v = direction.y > 0
 
 func _physics_process(delta):
 	velocity.y += gravity * delta
@@ -62,13 +61,18 @@ func _physics_process(delta):
 	move_and_slide()
 
 func projectileHit(damage):
-	heath -= damage
-	playerHit.emit()
-
-func death():
-	hide()
-	#used deferred to avoid problems setting it until safe
-	$CollisionShape2D.set_deferred("disabled", true)
+	if invincible:
+		return
+	invincible = true
+	health -= damage
+	playerHit.emit(health)
+	print("player hit" + str(health))
+	if health <= 0:
+		hide()
+		#used deferred to avoid problems setting it until safe
+		$CollisionShape2D.set_deferred("disabled", true)
+	await get_tree().create_timer(invincibleTime).timeout
+	invincible = false
 
 func start(pos):
 	position = pos
@@ -90,7 +94,6 @@ func action(projectile, speed):
 	Clone.global_position = shootPoint
 	Clone.linear_velocity = Vector2(speed, 0)
 	Clone.add_to_group("playerProjectile")
-	Clone.get_child(0).start()
 	self.get_parent().add_child(Clone)
 
 

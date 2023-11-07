@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://ci5ouf4isun7c"]
+
+[ext_resource type="Texture2D" uid="uid://bnj7cjn5b6lep" path="res://art/icon.svg" id="1_oqoj7"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_pvc5a"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_s2bo0"]
+
+[node name="playerUI" type="CanvasLayer"]
+
+[node name="healthBar" type="TextureProgressBar" parent="."]
+offset_right = 126.0
+offset_bottom = 40.0
+value = 100.0
+rounded = true
+texture_under = SubResource("PlaceholderTexture2D_pvc5a")
+texture_over = SubResource("PlaceholderTexture2D_s2bo0")
+texture_progress = ExtResource("1_oqoj7")

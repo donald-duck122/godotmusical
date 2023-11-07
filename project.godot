@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Godotmusical"
-run/main_scene="res://main.tscn"
+run/main_scene="res://main_root.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://art/icon.svg"
 
@@ -72,3 +72,4 @@ dash={
 2d_physics/layer_2="mobs"
 2d_physics/layer_3="bullets"
 2d_physics/layer_4="walls"
+2d_physics/layer_5="boss"
