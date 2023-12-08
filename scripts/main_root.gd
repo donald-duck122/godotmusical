@@ -7,11 +7,12 @@ var player
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	player = get_node("Player")
+	$Player.visible = true
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	pass
+	$Player.visible = true
 
 func arenaWin():
 	pass
@@ -23,4 +24,6 @@ func arenaButtonPresseeed(arenaName):
 		self.add_child(Clone)
 		print("boop")
 		$arenaSelector.visible = false
-	
+
+func startMap():
+	$Player.global_position = $mapGenerator.setMap(4,5,15,20)

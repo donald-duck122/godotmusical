@@ -1,0 +1,34 @@
+[gd_scene load_steps=20 format=3 uid="uid://v3ofbqq3hnad"]
+
+[ext_resource type="Script" path="res://scripts/map_generator.gd" id="1_kerk8"]
+[ext_resource type="PackedScene" uid="uid://c0rp55lsxndob" path="res://scenes/rooms/crossScene.tscn" id="2_dqiym"]
+[ext_resource type="PackedScene" uid="uid://ce021221xv1jd" path="res://scenes/rooms/horizontalScene.tscn" id="3_i8nla"]
+[ext_resource type="PackedScene" uid="uid://6eik2jvudq8c" path="res://scenes/rooms/northEast.tscn" id="4_iwk4a"]
+[ext_resource type="PackedScene" uid="uid://bvvt2qjrkcsul" path="res://scenes/rooms/northWest.tscn" id="5_mc3ny"]
+[ext_resource type="PackedScene" uid="uid://blp88byxaxy5e" path="res://scenes/rooms/southEast.tscn" id="6_882oe"]
+[ext_resource type="PackedScene" uid="uid://dmbr7faj5fois" path="res://scenes/rooms/southWest.tscn" id="7_y6wjs"]
+[ext_resource type="PackedScene" uid="uid://cqvujjvnuqml1" path="res://scenes/rooms/TEastScene.tscn" id="8_87p6q"]
+[ext_resource type="PackedScene" uid="uid://kh8wm5f0hdh1" path="res://scenes/rooms/TNorthScene.tscn" id="9_2kfbm"]
+[ext_resource type="PackedScene" uid="uid://dhdnt6240x8fq" path="res://scenes/rooms/TSouthScene.tscn" id="10_esvr2"]
+[ext_resource type="PackedScene" uid="uid://dw4wo7kkc6tkk" path="res://scenes/rooms/TWestScene.tscn" id="11_167sw"]
+[ext_resource type="PackedScene" uid="uid://dm2u3343e7kvx" path="res://scenes/rooms/verticalScene.tscn" id="12_j4uwk"]
+[ext_resource type="PackedScene" uid="uid://6d7a1mombf4t" path="res://scenes/rooms/blankScene.tscn" id="13_cmrgl"]
+[ext_resource type="PackedScene" uid="uid://ywc1eq6kkxxk" path="res://scenes/rooms/northEnd.tscn" id="13_nna70"]
+[ext_resource type="PackedScene" uid="uid://c0vuggm1hs0h2" path="res://scenes/rooms/startScene.tscn" id="14_c0t7k"]
+[ext_resource type="PackedScene" uid="uid://cajtcb6oftysa" path="res://scenes/rooms/eastEnd.tscn" id="14_vd8db"]
+[ext_resource type="PackedScene" uid="uid://lsndrtv6y3mu" path="res://scenes/rooms/endScene.tscn" id="15_l1xp5"]
+[ext_resource type="PackedScene" uid="uid://doksg20cllfas" path="res://scenes/rooms/southEnd.tscn" id="15_mv7f6"]
+[ext_resource type="PackedScene" uid="uid://ou253r3ixw27" path="res://scenes/rooms/westEnd.tscn" id="16_hsw7q"]
+
+[node name="mapGenerator" type="Node2D"]
+script = ExtResource("1_kerk8")
+roomSceneArray = Array[PackedScene]([ExtResource("2_dqiym"), ExtResource("3_i8nla"), ExtResource("4_iwk4a"), ExtResource("5_mc3ny"), ExtResource("6_882oe"), ExtResource("7_y6wjs"), ExtResource("8_87p6q"), ExtResource("9_2kfbm"), ExtResource("10_esvr2"), ExtResource("11_167sw"), ExtResource("12_j4uwk"), ExtResource("13_nna70"), ExtResource("14_vd8db"), ExtResource("15_mv7f6"), ExtResource("16_hsw7q")])
+blankScene = ExtResource("13_cmrgl")
+startScene = ExtResource("14_c0t7k")
+endScene = ExtResource("15_l1xp5")
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Node2D2" type="Node2D" parent="." groups=["mapGenerator"]]
+
+[node name="Node" type="Node" parent="."]

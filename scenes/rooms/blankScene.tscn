@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://6d7a1mombf4t"]
+
+[node name="blankScene" type="Node2D"]
+metadata/northPath = true
+metadata/eastPath = true
+metadata/southPath = true
+metadata/westPath = true
+metadata/weighting = 0.0

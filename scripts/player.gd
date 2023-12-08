@@ -12,11 +12,15 @@ signal playerHit(currentHealth)
 @export var dashSpeed = 10
 @export var dashCooldown = 2
 
+@export var melee : PackedScene
+
 var screenSize
 var invincible = false
 var jumping = false
 var canShoot = false
 var canDash = false
+var canMelee = false
+var canAttack = true
 var direction = Vector2.ZERO
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
@@ -34,14 +38,27 @@ func _process(_delta):
 		direction.x += 1
 	if Input.is_action_pressed("moveLeft"):
 		direction.x -= 1
-	if Input.is_action_pressed("shoot") and canShoot:
+	if Input.is_action_pressed("shoot") and canShoot and canAttack:
 		canShoot = false
 		$shootCooldown.start()
 		action(bullet, bulletSpeed)
+		$attackCooldown.wait_time = 0.5
+	elif Input.is_action_pressed("melee") and canMelee and canAttack:
+		print("meleed")
+		canMelee = false
+		$meleeCooldown.start()
+		$attackCooldown.wait_time = $meleeCooldown.wait_time
+		action(melee, 0)
+		
 	if Input.is_action_pressed("dash") and canDash:
+		print("dashing")
 		canDash = false
 		$dashCooldown.start()
-		velocity.x = dashSpeed *100 * direction.x
+		if direction.x == 0 and $AnimatedSprite2D.flip_h:
+			direction.x = -1
+		elif direction.x==0:
+			direction.x = 1
+		velocity.x = dashSpeed *1000 * direction.x
 		move_and_slide()
 	
 	
@@ -57,7 +74,7 @@ func _physics_process(delta):
 	if Input.is_action_pressed("jump") and is_on_floor():
 		velocity.y = -jumpForce*50
 	self.velocity.x = (direction.x*delta*500*playerSpeed)
-	position = position.clamp(Vector2.ZERO, screenSize)
+	#position = position.clamp(Vector2.ZERO, screenSize)
 	move_and_slide()
 
 func projectileHit(damage):
@@ -77,13 +94,14 @@ func projectileHit(damage):
 func start(pos):
 	position = pos
 	show()
-	$CollisionShape2D.disabled = false
+	$hitbox.disabled = false
 
 
 func _on_shoot_cooldown_timeout():
 	canShoot = true
 
 func action(projectile, speed):
+	canAttack = false
 	var Clone = projectile.instantiate()
 	var shootPoint
 	if($AnimatedSprite2D.flip_h):
@@ -95,7 +113,17 @@ func action(projectile, speed):
 	Clone.linear_velocity = Vector2(speed, 0)
 	Clone.add_to_group("playerProjectile")
 	self.get_parent().add_child(Clone)
+	await get_tree().create_timer(0.05).timeout
+	$attackCooldown.start()
 
 
 func _on_dash_cooldown_timeout():
 	canDash = true
+
+
+func _on_melee_cooldown_timeout():
+	canMelee = true
+
+
+func _on_attack_cooldown_timeout():
+	canAttack = true

@@ -1,11 +1,27 @@
-[gd_scene load_steps=9 format=3 uid="uid://dbn7hv16kpv3o"]
+[gd_scene load_steps=13 format=3 uid="uid://dbn7hv16kpv3o"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_3i5fa"]
 [ext_resource type="Texture2D" uid="uid://by6tnb5g0qqq3" path="res://art/playerGrey_up1.png" id="1_ulm0w"]
 [ext_resource type="PackedScene" uid="uid://behw75osm6ats" path="res://scenes/bullet.tscn" id="2_iq51c"]
 [ext_resource type="Texture2D" uid="uid://cjdjoptgyjslu" path="res://art/playerGrey_up2.png" id="2_jth17"]
-[ext_resource type="Texture2D" uid="uid://b0r5i43l07ftu" path="res://art/playerGrey_walk1.png" id="3_343fa"]
-[ext_resource type="Texture2D" uid="uid://bmyy5g4u0js6f" path="res://art/playerGrey_walk2.png" id="4_475yj"]
+[ext_resource type="PackedScene" uid="uid://cvqexq3p1fcly" path="res://scenes/melee.tscn" id="3_i3sbw"]
+[ext_resource type="Texture2D" uid="uid://uwu4ytruwa6v" path="res://art/Duckwalk.png" id="6_f1bsg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ji02y"]
+atlas = ExtResource("6_f1bsg")
+region = Rect2(0, 11, 21, 21)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kkif6"]
+atlas = ExtResource("6_f1bsg")
+region = Rect2(32, 11, 21, 21)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ni6y"]
+atlas = ExtResource("6_f1bsg")
+region = Rect2(0, 43, 21, 21)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qrvhk"]
+atlas = ExtResource("6_f1bsg")
+region = Rect2(32, 43, 21, 21)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5puw5"]
 animations = [{
@@ -22,48 +38,66 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_343fa")
+"texture": SubResource("AtlasTexture_ji02y")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_475yj")
+"texture": SubResource("AtlasTexture_kkif6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ni6y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qrvhk")
 }],
 "loop": true,
 "name": &"walk",
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gku2i"]
-radius = 25.0
-height = 68.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r3sh6"]
+size = Vector2(63, 63.5)
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
+position = Vector2(2, -1)
 collision_mask = 9
 script = ExtResource("1_3i5fa")
 playerSpeed = 40
 bullet = ExtResource("2_iq51c")
 bulletSpeed = 600
-metadata/_edit_group_ = true
+dashSpeed = 20
+melee = ExtResource("3_i3sbw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-scale = Vector2(0.5, 0.5)
+position = Vector2(-17, 16)
+rotation = -6.28319
+scale = Vector2(3, 3.03)
 sprite_frames = SubResource("SpriteFrames_5puw5")
 animation = &"walk"
+offset = Vector2(5, -5)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_gku2i")
+[node name="hitbox" type="CollisionShape2D" parent="."]
+position = Vector2(-2, 0.75)
+shape = SubResource("RectangleShape2D_r3sh6")
 
 [node name="shootCooldown" type="Timer" parent="."]
-wait_time = 0.5
 autostart = true
 
 [node name="shootPointR" type="Marker2D" parent="."]
-position = Vector2(32, -26)
+position = Vector2(33, -20)
 
 [node name="shootPointL" type="Marker2D" parent="."]
-position = Vector2(-36, -26)
+position = Vector2(-39, -20)
 
 [node name="dashCooldown" type="Timer" parent="."]
 autostart = true
 
+[node name="meleeCooldown" type="Timer" parent="."]
+wait_time = 0.3
+autostart = true
+
+[node name="attackCooldown" type="Timer" parent="."]
+
 [connection signal="timeout" from="shootCooldown" to="." method="_on_shoot_cooldown_timeout"]
 [connection signal="timeout" from="dashCooldown" to="." method="_on_dash_cooldown_timeout"]
+[connection signal="timeout" from="meleeCooldown" to="." method="_on_melee_cooldown_timeout"]
+[connection signal="timeout" from="attackCooldown" to="." method="_on_attack_cooldown_timeout"]

@@ -31,6 +31,7 @@ var inPlace = false
 var destination = Vector2()
 var actionNumber = 2
 var prevActionNumber
+
 func _ready():
 	while !player:
 		player = get_parent().get_node("Player")
@@ -94,6 +95,7 @@ func spikeAttack():
 	canMove = true
 
 func shootDisks(shootPoint):
+	print("shooting")
 	var tspeed
 	canAction = false
 	if(!$AnimatedSprite2D.flip_h):
