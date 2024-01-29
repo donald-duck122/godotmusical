@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://cign0isk5hlbl"]
+[gd_scene load_steps=7 format=3 uid="uid://cign0isk5hlbl"]
 
 [ext_resource type="Script" path="res://scripts/main_root.gd" id="1_flmxl"]
-[ext_resource type="PackedScene" uid="uid://gd26x5a62gy2" path="res://scenes/arena1.tscn" id="1_ndlva"]
+[ext_resource type="PackedScene" uid="uid://gd26x5a62gy2" path="res://scenes/arenas/arena1.tscn" id="1_ndlva"]
 [ext_resource type="PackedScene" uid="uid://ci5ouf4isun7c" path="res://scenes/player_ui.tscn" id="4_xxhn4"]
 [ext_resource type="PackedScene" uid="uid://dbn7hv16kpv3o" path="res://scenes/player.tscn" id="4_y5v70"]
-[ext_resource type="Script" path="res://scripts/player_ui.gd" id="5_2lmvf"]
 [ext_resource type="PackedScene" uid="uid://dd4t6e4xfmpxo" path="res://scenes/arenaSelector.tscn" id="5_75g1u"]
 [ext_resource type="PackedScene" uid="uid://v3ofbqq3hnad" path="res://scenes/map_generator.tscn" id="7_etl5d"]
 
@@ -15,14 +14,13 @@ arena1 = ExtResource("1_ndlva")
 [node name="Player" parent="." instance=ExtResource("4_y5v70")]
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(0.1, 0.1)
+zoom = Vector2(0.6, 0.6)
 position_smoothing_enabled = true
 
 [node name="playerUI" parent="." instance=ExtResource("4_xxhn4")]
-script = ExtResource("5_2lmvf")
 
 [node name="arenaSelector" parent="." instance=ExtResource("5_75g1u")]
 
 [node name="mapGenerator" parent="." instance=ExtResource("7_etl5d")]
 
-[connection signal="startArena1" from="arenaSelector" to="." method="startMap"]
+[connection signal="startArena1" from="arenaSelector" to="." method="generateMap" binds= [4, 5, 15, 20]]

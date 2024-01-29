@@ -1,8 +1,13 @@
 extends CharacterBody2D
-signal playerHit(currentHealth)
+signal playerHit()
+signal playerGoldChanged(totalGold)
+signal playerMaxHealthChanged(maxHealth)
+signal playerHealthChanged(currentHealth)
+
 
 @export var playerSpeed = 400
-@export var health = 10
+@export var maxHealth = 10
+var health = maxHealth
 @export var jumpForce = 10
 @export var invincibleTime = 0.5
 
@@ -14,6 +19,9 @@ signal playerHit(currentHealth)
 
 @export var melee : PackedScene
 
+@export var startingGold:int = 10
+var currentGold = startingGold
+
 var screenSize
 var invincible = false
 var jumping = false
@@ -22,13 +30,18 @@ var canDash = false
 var canMelee = false
 var canAttack = true
 var direction = Vector2.ZERO
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
-
+var gravity = 0
+var playerUI:CanvasLayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	#hide()
+	await get_parent().is_node_ready()
 	screenSize = get_viewport_rect().size
-	hide()
+	var mapGenNode = get_tree().get_first_node_in_group("mapGenerator")
+	if mapGenNode:
+		mapGenNode.mapGenerationCompleted.connect(onMapLoaded.bind())
+	playerUI = get_tree().get_first_node_in_group("playerUI")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -44,14 +57,12 @@ func _process(_delta):
 		action(bullet, bulletSpeed)
 		$attackCooldown.wait_time = 0.5
 	elif Input.is_action_pressed("melee") and canMelee and canAttack:
-		print("meleed")
 		canMelee = false
 		$meleeCooldown.start()
 		$attackCooldown.wait_time = $meleeCooldown.wait_time
 		action(melee, 0)
 		
 	if Input.is_action_pressed("dash") and canDash:
-		print("dashing")
 		canDash = false
 		$dashCooldown.start()
 		if direction.x == 0 and $AnimatedSprite2D.flip_h:
@@ -82,20 +93,14 @@ func projectileHit(damage):
 		return
 	invincible = true
 	health -= damage
-	playerHit.emit(health)
-	print("player hit" + str(health))
+	playerHit.emit()
+	playerHealthChanged.emit(health)
 	if health <= 0:
 		hide()
 		#used deferred to avoid problems setting it until safe
 		$CollisionShape2D.set_deferred("disabled", true)
 	await get_tree().create_timer(invincibleTime).timeout
 	invincible = false
-
-func start(pos):
-	position = pos
-	show()
-	$hitbox.disabled = false
-
 
 func _on_shoot_cooldown_timeout():
 	canShoot = true
@@ -116,7 +121,6 @@ func action(projectile, speed):
 	await get_tree().create_timer(0.05).timeout
 	$attackCooldown.start()
 
-
 func _on_dash_cooldown_timeout():
 	canDash = true
 
@@ -127,3 +131,38 @@ func _on_melee_cooldown_timeout():
 
 func _on_attack_cooldown_timeout():
 	canAttack = true
+
+func changeGold(amount):
+	print("got gold emit " + str(amount))
+	currentGold += amount
+	playerGoldChanged.emit(currentGold)
+
+func changeMaxHealth(amount):
+	print("got health emit " + str(amount))
+	maxHealth += amount
+	health = maxHealth
+	playerMaxHealthChanged.emit(maxHealth)
+
+func connectChests():
+	var chestList = get_tree().get_nodes_in_group("chest")
+	for chest in chestList:
+		if hasSignal(chest, "playerMaxHealthChanged"):
+			chest.playerMaxHealthChanged.connect(changeMaxHealth.bind())
+		if hasSignal(chest, "playerGoldChanged"):
+			chest.playerGoldChanged.connect(changeGold.bind())
+
+func hasSignal(node : Node, signalName : String) -> bool:
+	var signalList = node.get_signal_list()
+	for signalDictionary in signalList:
+		if signalDictionary.name == signalName:
+			return true
+	print(str(node.name) + " has no signal " + str(signalName))
+	return false
+
+func onMapLoaded():
+	connectChests()
+	changeGold(0)
+	changeMaxHealth(0)
+	playerUI.show()
+	self.show()
+	gravity = ProjectSettings.get_setting("physics/2d/default_gravity")

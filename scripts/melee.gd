@@ -1,14 +1,12 @@
 extends RigidBody2D
 signal enemyHit(damage)
 signal playerHit(damage)
+signal interactableHit()
 
 @export var damage = 1
 
 func _on_life_time_timeout():
 	queue_free()
-
-func _ready():
-	print("meleeing")
 
 
 func _on_body_entered(body):
@@ -19,6 +17,10 @@ func _on_body_entered(body):
 	elif(self.is_in_group("enemyProjectile") and body.is_in_group("player")):
 		self.playerHit.connect(body.projectileHit)
 		playerHit.emit(damage)
+		queue_free()
+	elif(body.is_in_group("interactable") and self.is_in_group("playerProjectile")):
+		self.interactableHit.connect(body.onHit)
+		interactableHit.emit()
 		queue_free()
 	elif(body.is_in_group("hitable")):
 		queue_free()

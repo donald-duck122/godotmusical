@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=3 uid="uid://b01e5lhhfmle3"]
+
+[ext_resource type="Texture2D" uid="uid://c1i0okvoovdo8" path="res://art/boss1temp.png" id="1_48kvg"]
+[ext_resource type="Script" path="res://scripts/boss1.gd" id="1_i3ckt"]
+[ext_resource type="PackedScene" uid="uid://behw75osm6ats" path="res://scenes/bullet.tscn" id="2_rouir"]
+[ext_resource type="PackedScene" uid="uid://de5k53uwwefyc" path="res://scenes/extending_spike.tscn" id="3_okpi3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mx0l5"]
+size = Vector2(218, 164)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_obo0v"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_48kvg")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="boss1" type="RigidBody2D" node_paths=PackedStringArray("leftShootMarker", "rightShootMarker") groups=["enemy"]]
+collision_layer = 16
+collision_mask = 24
+max_contacts_reported = 100000
+contact_monitor = true
+script = ExtResource("1_i3ckt")
+leftShootMarker = NodePath("leftShootMarker")
+rightShootMarker = NodePath("rightShootMarker")
+disks = ExtResource("2_rouir")
+spikes = ExtResource("3_okpi3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(2, 34)
+shape = SubResource("RectangleShape2D_mx0l5")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." groups=["enemy"]]
+sprite_frames = SubResource("SpriteFrames_obo0v")
+
+[node name="leftShootMarker" type="Marker2D" parent="."]
+position = Vector2(-122, 50)
+
+[node name="rightShootMarker" type="Marker2D" parent="."]
+position = Vector2(128, 50)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

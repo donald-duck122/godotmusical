@@ -6,24 +6,14 @@ extends Node2D
 var player
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	player = get_node("Player")
-	$Player.visible = true
+	player = get_tree().get_first_node_in_group("player")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	$Player.visible = true
-
-func arenaWin():
+func _process(_delta):
 	pass
 
-func arenaButtonPresseeed(arenaName):
-	if arenaName == "arena1":
-		var Clone = arena1.instantiate()
-		player.reparent(Clone)
-		self.add_child(Clone)
-		print("boop")
-		$arenaSelector.visible = false
-
-func startMap():
-	$Player.global_position = $mapGenerator.setMap(4,5,15,20)
+func generateMap(horizontal:int, vertical:int, minimumRooms:int, maximumRooms:int):
+	var startRoom:Node2D = $mapGenerator.setMap(horizontal, vertical, minimumRooms, maximumRooms)
+	player.global_position = startRoom.get_node("startPosition").global_position
+	player.visible = true

@@ -12,6 +12,7 @@ var visited:bool
 var possibleRooms : Array[PackedScene]
 var numberOfPossibleRooms:int
 var placed : bool
+var roomID: int
 
 func _init():
 	north = false

@@ -1,4 +1,5 @@
 extends Node2D
+signal mapGenerationCompleted()
 
 const roomClass = preload("res://scripts/roomClass.gd")
 @export var roomSceneArray:Array[PackedScene]
@@ -19,6 +20,11 @@ var lowestTiles = []
 var totalrooms
 var playerCords
 
+var visibleRooms:Array
+
+func _process(delta):
+	print(playerCords)
+
 # Called when the node enters the scene tree for the first time.
 func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 	vertical = verticalLength
@@ -28,7 +34,8 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 	var possible = false
 	while not possible:
 		#randomly assign a start and finish room
-		startx = rng.randi_range(0,horizontal-1)
+		#startx = rng.randi_range(0,horizontal-1)
+		startx = 2
 		Map[startx][0].scene = startScene.instantiate()
 		Map[startx][0].placed = true
 		Map[startx][0].numberOfPossibleRooms = 0
@@ -37,7 +44,6 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 		Map[startx][0].south = Map[startx][0].scene.get_meta("southPath")
 		Map[startx][0].west = Map[startx][0].scene.get_meta("westPath")
 		updateNeighbours(startx,0)
-		print("start x: " + str(startx))
 		endx = rng.randi_range(0, horizontal-1)
 #		while endx == startx or endx == startx-1 or endx == startx + 1:
 #			endx = rng.randi_range(0, horizontal-1)
@@ -49,7 +55,6 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 		Map[endx][vertical-1].south = Map[endx][vertical-1].scene.get_meta("southPath")
 		Map[endx][vertical-1].west = Map[endx][vertical-1].scene.get_meta("westPath")
 		updateNeighbours(endx,vertical-1)
-		print("end x: " + str(endx))
 		#array for possibilities, room, and canVisit
 		#repeat getting the lowest tiles until array is empty meaning no possibilities left to fill
 		getLowestTiles()
@@ -83,7 +88,6 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 		#else restart process
 		testPossible()
 		if Map[endx][vertical-1].visited == true:
-			print(str(resetCount) + "reset count")
 			possible = true
 		else:
 			resetMap()
@@ -95,7 +99,6 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 		if numberOfRooms > maxRooms or numberOfRooms < minRooms:
 			resetMap()
 			resetCount = resetCount +1
-			print("Too much rooms")
 			possible = false
 			numberOfRooms = 0
 	
@@ -106,20 +109,98 @@ func setMap(horizontalLength, verticalLength, minRooms, maxRooms):
 				var node = Map[i][s].scene
 				self.get_parent().add_child(node)
 				node.global_position = Vector2(Map[i][s].x * 1000, Map[i][s].y *-650)
-	print(numberOfRooms)
+				toggleRoomCollision(node, false)
 	playerCords = [startx,0]
-	return Vector2(Map[startx][0].x * 1000 + 500, Map[startx][0].y * -650 + 300)
+	toggleRoomCollision(Map[startx][0].scene, true)
+	visibleRooms.append(playerCords)
+	print("at generation")
+	print(visibleRooms)
+	
+	loadNeighbours(startx,0)
+	#return the starting scene
+	mapGenerationCompleted.emit()
+	return Map[startx][0].scene
 
-func testing():
-		print("testing")
+func toggleRoomVisible(scene:Node2D, toggle:bool):
+	var children:Array = scene.get_children()
+	for node in children: 
+		if node.is_class("TileMap"):
+			var tilemap:TileMap = node
+			for i in tilemap.get_layers_count():
+				tilemap.set_layer_enabled(i,toggle)
+
+func toggleRoomCollision(scene:Node2D, toggle:bool):
+	var children:Array = scene.get_children()
+	for node in children: 
+		if node.is_class("Area2D"):
+			node.set_deferred("monitoring", toggle)
+		elif node.is_class("TileMap"):
+			toggleRoomVisible(scene, toggle)
+
+func loadNeighbours(x, y):
+	var enteredRoom:Node2D = Map[x][y].scene
+	var currentPath:Vector2
+	if enteredRoom.get_meta("northPath") == true:
+		currentPath = enteredRoom.get_node("northPath").global_position
+		loadRoom(x,y+1,currentPath,"southPath")
+	if enteredRoom.get_meta("eastPath") == true:
+		currentPath = enteredRoom.get_node("eastPath").global_position
+		loadRoom(x+1,y,currentPath,"westPath")
+	if enteredRoom.get_meta("southPath") == true:
+		currentPath = enteredRoom.get_node("southPath").global_position
+		loadRoom(x,y-1,currentPath,"northPath")
+	if enteredRoom.get_meta("westPath") == true:
+		currentPath = enteredRoom.get_node("westPath").global_position
+		loadRoom(x-1,y,currentPath,"eastPath")
+	
+	#find neighbour room
+	#find position of right enternace
+	#find difference between main scene position and the enterance marker
+	#place new scene at location of old room marker with difference of new scene local and global position
+
+func loadRoom(x:int,y:int,currentPath:Vector2,path:String):
+	var loadedRoom:Node2D = Map[x][y].scene
+	var centrePosition:Vector2 = loadedRoom.global_position
+	if !loadedRoom.get_node_or_null(path):
+		print("no path instance: " + str(path) + " in " + str(loadedRoom.name))
+		return
+	var pathPosition:Vector2 = loadedRoom.get_node(path).global_position
+	var difference:Vector2 = pathPosition - centrePosition
+	loadedRoom.global_position = currentPath - difference
+	toggleRoomVisible(loadedRoom, true)
+	visibleRooms.append([x,y])
+	
+func changeRoom(direction:String):
+	if direction == "north":
+		playerCords[1] = playerCords[1] + 1
+	elif direction == "east":
+		playerCords[0] = playerCords[0] + 1
+	elif direction== "south":
+		playerCords[1] = playerCords[1] - 1
+	elif direction == "west":
+		playerCords[0] = playerCords[0] - 1
+	else: 
+		print("Empty direction when changed room")
+		return
+	print("On change")
+	print(visibleRooms)
+	for cords in visibleRooms:
+		toggleRoomCollision(Map[cords[0]][cords[1]].scene, false)
+	visibleRooms.clear()
+	
+	loadNeighbours(playerCords[0],playerCords[1])
+	toggleRoomCollision(Map[playerCords[0]][playerCords[1]].scene, true)
+	visibleRooms.append(playerCords)
 
 func resetMap():
 	totalrooms = len(roomSceneArray)
+	visibleRooms.clear()
 	Map.clear()
 	Map.resize(horizontal)
 	for i in horizontal:
 		Map[i] = []
 		Map[i].resize(vertical)
+	var index = 1
 	for i in len(Map):
 		for s in len(Map[i]):
 			Map[i][s] = roomClass.new()
@@ -133,6 +214,8 @@ func resetMap():
 			Map[i][s].visited = false
 			Map[i][s].placed = false
 			Map[i][s].numberOfPossibleRooms = totalrooms
+			Map[i][s].roomID = index
+			index = index + 1
 
 func getLowestTiles():
 	#determining where to place

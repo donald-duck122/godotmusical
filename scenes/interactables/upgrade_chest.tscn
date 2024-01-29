@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2tixrkopqhu8"]
+
+[ext_resource type="Script" path="res://upgradeChest.gd" id="1_2ptop"]
+[ext_resource type="Texture2D" uid="uid://ef86wyb4jhyh" path="res://art/tempArt/tempChest.png" id="2_i5dbc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b1atf"]
+size = Vector2(16, 16)
+
+[node name="upgradeChest" type="StaticBody2D" groups=["chest", "interactable"]]
+collision_layer = 32
+collision_mask = 5
+script = ExtResource("1_2ptop")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_b1atf")
+
+[node name="Spite2D" type="Sprite2D" parent="."]
+scale = Vector2(3, 3)
+texture = ExtResource("2_i5dbc")

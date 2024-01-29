@@ -17,6 +17,8 @@ config/icon="res://art/icon.svg"
 
 [display]
 
+window/size/viewport_width=2400
+window/size/viewport_height=1200
 window/stretch/mode="canvas_items"
 
 [dotnet]
@@ -78,6 +80,7 @@ melee={
 2d_physics/layer_3="bullets"
 2d_physics/layer_4="walls"
 2d_physics/layer_5="boss"
+2d_physics/layer_6="interactable"
 
 [rendering]
 
