@@ -1,10 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://c0vuggm1hs0h2"]
+[gd_scene load_steps=7 format=3 uid="uid://c0vuggm1hs0h2"]
 
 [ext_resource type="TileSet" uid="uid://bu01ifrbmlsjk" path="res://art/mainTileSet.tres" id="2_eyny8"]
 [ext_resource type="Script" path="res://scripts/roomChange.gd" id="2_vx0s7"]
+[ext_resource type="PackedScene" uid="uid://b2tixrkopqhu8" path="res://scenes/interactables/upgrade_chest.tscn" id="3_aarcs"]
+[ext_resource type="PackedScene" uid="uid://dtujafi4ynjh1" path="res://scenes/enemies/default_enemy.tscn" id="4_c54vm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_duxvq"]
 size = Vector2(425, 10)
+
+[sub_resource type="Curve2D" id="Curve2D_cwdnl"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 818, 572, 0, 0, 0, 0, 1120, 570)
+}
+point_count = 2
 
 [node name="startScene" type="Node2D"]
 metadata/northPath = true
@@ -31,5 +39,22 @@ metadata/direction = "north"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="northPath"]
 position = Vector2(-1, -25)
 shape = SubResource("RectangleShape2D_duxvq")
+
+[node name="upgradeChest" parent="." instance=ExtResource("3_aarcs")]
+position = Vector2(105, 599)
+
+[node name="defaultEnemy" parent="." node_paths=PackedStringArray("path_follow") instance=ExtResource("4_c54vm")]
+position = Vector2(819, 569)
+collision_layer = 2
+collision_mask = 12
+path_follow = NodePath("../Path2D/PathFollow2D")
+
+[node name="Path2D" type="Path2D" parent="."]
+position = Vector2(3, -4)
+curve = SubResource("Curve2D_cwdnl")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
+position = Vector2(818, 572)
+rotation = -0.00662242
 
 [connection signal="body_entered" from="northPath" to="northPath" method="_on_area_entered"]

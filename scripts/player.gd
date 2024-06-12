@@ -80,7 +80,7 @@ func _process(_delta):
 		$AnimatedSprite2D.flip_h = direction.x < 0
 
 func _physics_process(delta):
-	velocity.y += gravity * delta
+	velocity.y += gravity*delta
 	# Handle Jump.
 	if Input.is_action_pressed("jump") and is_on_floor():
 		velocity.y = -jumpForce*50

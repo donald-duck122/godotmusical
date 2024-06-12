@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3 uid="uid://dtujafi4ynjh1"]
+
+[ext_resource type="Script" path="res://defaultEnemy.gd" id="1_c3ks2"]
+[ext_resource type="Texture2D" uid="uid://c1i0okvoovdo8" path="res://art/boss1temp.png" id="2_ve6m6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hgjmy"]
+size = Vector2(60, 44)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6jjif"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ve6m6")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_82goc"]
+size = Vector2(198, 44)
+
+[node name="defaultEnemy" type="CharacterBody2D" node_paths=PackedStringArray("ground_checker")]
+scale = Vector2(2, 2)
+script = ExtResource("1_c3ks2")
+ground_checker = NodePath("RayCast2D")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(3, 5)
+shape = SubResource("RectangleShape2D_hgjmy")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(2, -3)
+scale = Vector2(0.277344, 0.261719)
+sprite_frames = SubResource("SpriteFrames_6jjif")
+
+[node name="playerDetector" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="playerDetector"]
+position = Vector2(59, 5)
+shape = SubResource("RectangleShape2D_82goc")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(2.08165e-12, 40)
+collision_mask = 8
+hit_from_inside = true
+collide_with_areas = true
+
+[connection signal="body_entered" from="playerDetector" to="." method="_on_player_detector_body_entered"]
+[connection signal="body_exited" from="playerDetector" to="." method="_on_player_detector_body_exited"]
